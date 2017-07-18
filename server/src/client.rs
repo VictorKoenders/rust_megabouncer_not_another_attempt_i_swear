@@ -1,11 +1,9 @@
-use mio::tcp::TcpStream;
-use std::net::SocketAddr;
-use mio::Token;
-use super::ClientEvent;
-use shared::tcp_listener::TcpReader;
-use shared::listener::traits::{Message, Value};
-use super::channel::Channel;
+use shared::{TcpReader, Message, Value, Channel};
 use std::collections::HashMap;
+use std::net::SocketAddr;
+use mio::tcp::TcpStream;
+use super::ClientEvent;
+use mio::Token;
 
 pub struct Client {
     reader: TcpReader,

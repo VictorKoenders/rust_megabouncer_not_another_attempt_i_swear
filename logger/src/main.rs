@@ -1,7 +1,7 @@
 extern crate shared;
 
 fn main() {
-    let mut client = shared::listener::client::Client::new("Logger");
+    let mut client = shared::Client::new("Logger");
     client.register(State {}, vec![Box::new(Logger {})]);
 
     client.run();
@@ -10,16 +10,12 @@ fn main() {
 struct State;
 struct Logger;
 
-impl shared::listener::traits::Listener<State> for Logger {
+impl shared::Listener<State> for Logger {
     fn channels(&self) -> Vec<&str> {
         vec!["*"]
     }
 
-    fn handle(
-        &mut self,
-        _state: &mut State,
-        request: &mut shared::listener::traits::Request,
-    ) -> shared::listener::traits::Result<()> {
+    fn handle(&mut self, _state: &mut State, request: &mut shared::Request) -> shared::Result<()> {
         println!("{:?} {:?}", request.channel, request.data);
         Ok(())
     }

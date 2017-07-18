@@ -6,6 +6,13 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate mio;
 
-pub mod channel;
-pub mod listener;
-pub mod tcp_listener;
+pub mod macros;
+mod channel;
+mod tcp_listener;
+mod traits;
+mod client;
+
+pub use channel::*;
+pub use tcp_listener::*;
+pub use traits::*;
+pub use client::*;

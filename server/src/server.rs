@@ -1,9 +1,9 @@
-use super::client::Client;
 use mio::{Token, Poll, Events, Event, Ready, PollOpt};
-use std::net::Ipv4Addr;
-use mio::net::TcpListener;
+use shared::{Channel, Message, Value};
 use std::collections::HashMap;
-use shared::listener::traits::{Message, Value};
+use mio::net::TcpListener;
+use super::client::Client;
+use std::net::Ipv4Addr;
 
 #[derive(Default)]
 pub struct Server {
@@ -118,7 +118,7 @@ impl Server {
 
     pub fn broadcast(&mut self, channel: String, data: HashMap<String, Value>) {
         println!("Broadcasting {:?} ({:?})", channel, data);
-        let channel = ::channel::Channel::from(channel);
+        let channel = Channel::from(channel);
         for client in &mut self.clients {
             if client.is_listening_to(&channel) {
                 client.emit(Message::Emit(channel.to_string(), data.clone()));
