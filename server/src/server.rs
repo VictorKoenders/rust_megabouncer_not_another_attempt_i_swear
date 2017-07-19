@@ -1,9 +1,9 @@
-use super::client::Client;
 use mio::{Token, Poll, Events, Event, Ready, PollOpt};
-use std::net::Ipv4Addr;
-use mio::net::TcpListener;
-use std::collections::HashMap;
 use shared::{Channel, Message, Value};
+use std::collections::HashMap;
+use mio::net::TcpListener;
+use super::client::Client;
+use std::net::Ipv4Addr;
 
 #[derive(Default)]
 pub struct Server {

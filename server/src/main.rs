@@ -8,12 +8,12 @@ extern crate mio;
 mod client;
 mod server;
 
-use std::net::Ipv4Addr;
-use mio::net::TcpListener;
 use mio::{Token, Events, Event, Poll, Ready, PollOpt};
-use shared::{Message, Value};
-use client::Client;
 use std::collections::HashMap;
+use shared::{Message, Value};
+use mio::net::TcpListener;
+use std::net::Ipv4Addr;
+use client::Client;
 
 
 fn main() {

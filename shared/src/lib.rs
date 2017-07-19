@@ -7,7 +7,6 @@ extern crate serde_derive;
 extern crate mio;
 
 pub mod macros;
-
 mod channel;
 mod tcp_listener;
 mod traits;

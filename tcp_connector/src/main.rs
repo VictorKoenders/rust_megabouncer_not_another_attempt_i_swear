@@ -2,24 +2,20 @@
 
 #[macro_use(try_get_field)]
 extern crate shared;
+extern crate mio;
 
-use shared::*;
+use shared::Client;
 
-mod tcp_connector;
-mod tcp_connection;
+mod structs;
+mod connector;
+mod data;
 
-pub use tcp_connector::TcpConnector;
-pub use tcp_connection::TcpConnection;
+pub use structs::{TcpState, ConnectionState, TcpConnection};
+pub use connector::TcpConnector;
+pub use data::TcpData;
 
 fn main() {
     let mut client = Client::new("tcp connector");
     client.register(TcpState::default(), vec![Box::new(TcpConnector {})]);
     client.run();
 }
-
-#[derive(Default)]
-struct TcpState {
-    pub connections: Vec<TcpConnection>,
-}
-
-

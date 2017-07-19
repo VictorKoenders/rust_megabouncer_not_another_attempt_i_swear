@@ -25,6 +25,7 @@ impl Client {
         let bundle = Bundle {
             state: state,
             listeners: listeners,
+            tokens: Vec::new(),
         };
         self.bundles.push(Box::new(bundle));
     }
@@ -43,6 +44,7 @@ impl Client {
             let poll = Poll::new().unwrap();
             const TOKEN: Token = Token(0);
             let mut events = Events::with_capacity(1024);
+            let mut next_token = 1usize;
 
             poll.register(
                 &stream,
@@ -64,30 +66,49 @@ impl Client {
             while reader.connected {
                 poll.poll(&mut events, None).unwrap();
                 for event in &events {
-                    if event.readiness().is_writable() && reader.process_write_queue().is_err() {
-                        break;
-                    }
-                    if event.readiness().is_readable() {
-                        for message in reader.read() {
-                            match message {
-                                Message::Emit(str_channel, data) => {
-                                    let channel = Channel::from(str_channel);
-                                    let mut request = super::traits::Request {
-                                        channel: &channel,
-                                        data: &data,
-                                        responses: Vec::new(),
-                                        poll: &poll,
-                                    };
-                                    for bundle in &mut self.bundles {
-                                        bundle.handle(&mut request).unwrap();
+                    if event.token() == TOKEN {
+                        if event.readiness().is_writable() &&
+                            reader.process_write_queue().is_err()
+                        {
+                            break;
+                        }
+                        if event.readiness().is_readable() {
+                            for message in reader.read() {
+                                match message {
+                                    Message::Emit(str_channel, data) => {
+                                        let channel = Channel::from(str_channel);
+                                        let mut request = super::traits::Request {
+                                            channel: &channel,
+                                            data: &data,
+                                            responses: Vec::new(),
+                                            poll: &poll,
+                                            next_token: &mut next_token,
+                                            tokens: Vec::new(),
+                                        };
+                                        for bundle in &mut self.bundles {
+                                            bundle.handle(&mut request).unwrap();
+                                            if request.tokens.len() > 0 {
+                                                bundle.update_tokens(
+                                                    Vec::new(),
+                                                    &mut request.tokens,
+                                                );
+                                            }
+                                        }
+                                        for message in request.responses {
+                                            reader.write(message);
+                                        }
                                     }
-                                    for message in request.responses {
-                                        reader.write(message);
+                                    x => {
+                                        println!("Unexpected message: {:?}", x);
                                     }
                                 }
-                                x => {
-                                    println!("Unexpected message: {:?}", x);
-                                }
+                            }
+                        }
+
+                    } else {
+                        for bundle in &mut self.bundles {
+                            if bundle.has_token(&event.token()) {
+                                bundle.handle_event(&event).unwrap();
                             }
                         }
                     }
