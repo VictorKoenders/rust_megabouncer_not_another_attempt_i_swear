@@ -3,17 +3,6 @@ use channel::Channel;
 use mio::Poll;
 
 pub type Result<T> = ::std::result::Result<T, ListenerError>;
-
-#[macro_export]
-macro_rules! try_get_field{
-    ($request:expr, $field:expr, $type:tt) => {
-        match $request.data.get(stringify!($field)).and_then(|v| v.$type()) {
-            Some(v) => v,
-            None => return Err(::shared::listener::traits::ListenerError::FieldNotFound(String::from(stringify!($field)))),
-        };
-
-    }
-}
 #[derive(Debug)]
 pub enum ListenerError {
     Unknown(String),

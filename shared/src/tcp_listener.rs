@@ -1,5 +1,5 @@
 use mio::net::TcpStream;
-use super::listener::traits::{Message, Result};
+use super::traits::{Message, Result};
 use serde_json::from_str;
 use std::io::{Read, Write};
 
@@ -88,7 +88,7 @@ impl TcpReader {
             Err(e) => {
                 println!("Could not write: {:?}", e);
                 self.connected = false;
-                Err(super::listener::traits::ListenerError::Unknown(
+                Err(super::traits::ListenerError::Unknown(
                     format!("Could not write {:?}", e),
                 ))
             }

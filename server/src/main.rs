@@ -7,15 +7,13 @@ extern crate mio;
 
 mod client;
 mod server;
-mod channel;
 
 use std::net::Ipv4Addr;
 use mio::net::TcpListener;
 use mio::{Token, Events, Event, Poll, Ready, PollOpt};
-use shared::listener::traits::Message;
+use shared::{Message, Value};
 use client::Client;
 use std::collections::HashMap;
-use shared::listener::traits::Value;
 
 
 fn main() {

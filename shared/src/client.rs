@@ -50,7 +50,7 @@ impl Client {
                 Ready::readable() | Ready::writable(),
                 PollOpt::edge(),
             ).unwrap();
-            let mut reader = super::super::tcp_listener::TcpReader::new(stream);
+            let mut reader = super::tcp_listener::TcpReader::new(stream);
 
             reader.write(Message::Identify(self.name.clone()));
             reader.write(Message::RegisterListeners(
