@@ -7,6 +7,7 @@ pub struct TcpReader {
     stream: TcpStream,
     read_buffer: Vec<u8>,
     write_buffer: Vec<u8>,
+    writable: bool,
     pub connected: bool,
 }
 
@@ -16,6 +17,7 @@ impl TcpReader {
             stream: stream,
             read_buffer: Vec::with_capacity(1024),
             write_buffer: Vec::with_capacity(1024),
+            writable: false,
             connected: true,
         }
     }
@@ -77,17 +79,22 @@ impl TcpReader {
         str += "\n";
         let bytes = str.as_bytes();
         self.write_buffer.extend(bytes);
+        if self.writable {
+            self.process_write_queue().unwrap();
+        }
     }
 
     pub fn process_write_queue(&mut self) -> Result<()> {
         match self.stream.write(&self.write_buffer) {
             Ok(length) => {
                 self.write_buffer.drain(..length);
+                self.writable = self.write_buffer.is_empty();
                 Ok(())
             }
             Err(e) => {
                 println!("Could not write: {:?}", e);
                 self.connected = false;
+                self.writable = false;
                 Err(super::traits::ListenerError::Unknown(
                     format!("Could not write {:?}", e),
                 ))

@@ -21,7 +21,7 @@ impl<'a> Request<'a> {
         E: Evented,
     {
         let token = Token(*self.next_token);
-        *self.next_token = *self.next_token + 1;
+        *self.next_token += 1;
 
         self.poll.register(
             evented,

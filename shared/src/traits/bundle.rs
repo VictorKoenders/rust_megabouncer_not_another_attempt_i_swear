@@ -1,5 +1,5 @@
-use super::{Listener, Request, Result};
-use mio::{Event, Token};
+use super::{Listener, Message, Request, Result};
+use mio::{Event, Token, Poll};
 
 pub struct Bundle<TState: 'static> {
     pub state: TState,
@@ -9,9 +9,11 @@ pub struct Bundle<TState: 'static> {
 
 pub trait BundleImpl {
     fn handle(&mut self, request: &mut Request) -> Result<()>;
-    fn handle_event(&mut self, event: &Event) -> Result<()>;
+    fn handle_event(&mut self, event: &Event, messages: &mut Vec<Message>) -> Result<()>;
     fn listener_channels(&self) -> Vec<&str>;
     fn has_token(&self, token: &Token) -> bool;
+    fn register_poll(&mut self, poll: &Poll) -> Result<()>;
+    fn connect_commands(&self) -> Vec<Vec<Message>>;
     fn update_tokens(&mut self, remove_tokens: Vec<Token>, add_tokens: &mut Vec<Token>);
 }
 
@@ -39,14 +41,30 @@ impl<TState> BundleImpl for Bundle<TState> {
         self.tokens.iter().any(|t| t == token)
     }
 
+    fn register_poll(&mut self, poll: &Poll) -> Result<()> {
+        for listener in &mut self.listeners {
+            for token in listener.register_poll(poll)? {
+                self.tokens.push(token);
+            }
+        }
+        Ok(())
+    }
+
     fn update_tokens(&mut self, add_tokens: Vec<Token>, remove_tokens: &mut Vec<Token>) {
         self.tokens.retain(|t| !add_tokens.contains(t));
         self.tokens.append(remove_tokens);
     }
 
-    fn handle_event(&mut self, event: &Event) -> Result<()> {
+    fn connect_commands(&self) -> Vec<Vec<Message>> {
+        self.listeners
+            .iter()
+            .map(|l| l.connect_commands())
+            .collect()
+    }
+
+    fn handle_event(&mut self, event: &Event, messages: &mut Vec<Message>) -> Result<()> {
         for listener in &mut self.listeners {
-            listener.handle_event(event)?;
+            listener.handle_event(event, messages)?;
         }
         Ok(())
     }

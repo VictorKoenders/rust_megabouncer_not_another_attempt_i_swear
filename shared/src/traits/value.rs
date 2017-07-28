@@ -2,6 +2,7 @@
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Value {
     String(String),
+    Null,
     I32(i32),
     F32(f32),
     Array(Vec<Value>),

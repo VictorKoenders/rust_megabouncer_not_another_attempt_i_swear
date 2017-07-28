@@ -1,4 +1,4 @@
-use mio::Event;
+use mio::{Event, Token, Poll};
 
 mod bundle;
 mod message;
@@ -28,7 +28,13 @@ impl From<::std::io::Error> for ListenerError {
 pub trait Listener<TState> {
     fn handle(&mut self, state: &mut TState, request: &mut Request) -> Result<()>;
     fn channels(&self) -> Vec<&str>;
-    fn handle_event(&mut self, _event: &Event) -> Result<()> {
+    fn connect_commands(&self) -> Vec<Message> {
+        Vec::new()
+    }
+    fn register_poll(&mut self, _poll: &Poll) -> Result<Vec<Token>> {
+        Ok(Vec::new())
+    }
+    fn handle_event(&mut self, _event: &Event, _messages: &mut Vec<Message>) -> Result<()> {
         Ok(())
     }
 }

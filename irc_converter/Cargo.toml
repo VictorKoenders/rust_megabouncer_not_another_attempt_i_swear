@@ -1,0 +1,11 @@
+[package]
+name = "irc_converter"
+version = "0.1.0"
+authors = ["trangar"]
+
+[dependencies]
+shared = { path = "../shared" }
+mio = "*"
+serde = "*"
+serde_json = "*"
+serde_derive = "*"

@@ -9,6 +9,18 @@ pub enum Message {
 }
 
 impl Message {
+    pub fn missing_key_error<T: ToString>(key: T) -> Message {
+        Message::Emit(String::from("error"), {
+            let mut map = HashMap::new();
+            map.insert(
+                String::from("message"),
+                Value::String(String::from("missing key")),
+            );
+            map.insert(String::from("key"), Value::String(key.to_string()));
+            map
+        })
+    }
+
     pub fn no_name_error() -> Message {
         Message::Emit(String::from("error"), {
             let mut map = HashMap::new();

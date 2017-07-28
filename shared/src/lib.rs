@@ -16,3 +16,4 @@ pub use channel::*;
 pub use tcp_listener::*;
 pub use traits::*;
 pub use client::*;
+pub use std::collections::HashMap;

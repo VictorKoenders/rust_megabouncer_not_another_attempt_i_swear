@@ -7,6 +7,8 @@ extern crate mio;
 
 mod client;
 mod server;
+#[cfg(test)]
+mod tests;
 
 use mio::{Token, Events, Event, Poll, Ready, PollOpt};
 use std::collections::HashMap;
